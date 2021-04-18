@@ -4,8 +4,7 @@ const express = require('express');
 const cors = require('cors');
 
 require('dotenv').config();
-
-const weatherData = require('./data/weather.json');
+const superagent = require('superagent');
 
 const app = express();
 
@@ -24,19 +23,16 @@ function Forecast(day) {
   this.description = day.weather.description;
 }
 
-// creates an array of days by mapping over the weather data from weather.json and creating a new Forecast object for each item in the array
 app.get('/weather', (request, response) => {
-  try {
-    let weatherArray = weatherData.data.map(day => new Forecast(day));
-    response.send(weatherArray);
-  } catch (error) {
-    handleErrors(error, response);
-  }
+  superagent.get('https://api.weatherbit.io/v2.0/forecast/daily')
+    .query({
+      key: process.env.WEATHER_API_KEY,
+      lat: request.query.lat,
+      lon: request.query.lon,
+    })
+    .then(weatherData => {
+      response.json(weatherData.body.data.map(day => (new Forecast(day))));
+    });
 });
-
-
-function handleErrors(error, response) {
-  response.status(500).send('internal error');
-}
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
