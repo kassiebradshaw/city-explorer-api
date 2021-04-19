@@ -36,6 +36,7 @@ app.get('/weather', (request, response) => {
       lat: request.query.lat,
       lon: request.query.lon,
     })
+    .set({'Access-Control-Allow-Origin' : '*'})
     .then(weatherData => {
       response.json(weatherData.body.data.map(day => (new Forecast(day))));
     });
