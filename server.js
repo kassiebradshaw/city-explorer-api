@@ -8,7 +8,13 @@ const superagent = require('superagent');
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    callback(null, true);
+  }
+};
+
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 3001;
 
