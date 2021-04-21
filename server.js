@@ -36,10 +36,29 @@ app.get('/weather', (request, response) => {
       lat: request.query.lat,
       lon: request.query.lon,
     })
-    .set({'Access-Control-Allow-Origin' : '*'})
+    .set({ 'Access-Control-Allow-Origin': '*' })
     .then(weatherData => {
       response.json(weatherData.body.data.map(day => (new Forecast(day))));
     });
+});
+
+function Movie(selection) {
+  this.title = selection.title;
+  this.overview = selection.overview;
+}
+
+app.get('/movies', (request, response) => {
+  superagent.get('https://api.themoviedb.org/3/search/movie')
+    .query({
+      api_key: process.env.MOVIE_API_KEY,
+      // query: request.query.city,
+      query: 'Portland',
+    })
+    .then(movieInfo => {
+      console.log(movieInfo.body.results.map(selection => (new Movie(selection))));
+      response.json(movieInfo.body.results.map(selection => (new Movie(selection))));
+    }
+    );
 });
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
