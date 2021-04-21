@@ -52,7 +52,11 @@ app.get('/weather', (request, response) => {
 
 
 app.get('/movies', (request, response) => {
-  superagent.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${request.query.query}`)
+  superagent.get('https://api.themoviedb.org/3/search/movie')
+    .query({
+      api_key: process.env.MOVIE_API_KEY,
+      query: request.query.query
+    })
     .set({ 'Access-Control-Allow-Origin': '*' })
     .then(movieInfo => {
       console.log(movieInfo.body.results.map(selection => (new Movie(selection))));
