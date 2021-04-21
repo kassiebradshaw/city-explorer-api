@@ -29,6 +29,13 @@ function Forecast(day) {
   this.description = day.weather.description;
 }
 
+// constructor function to create a Movie object for each selection
+// gives movie's title and overview
+function Movie(selection) {
+  this.title = selection.title;
+  this.overview = selection.overview;
+}
+
 app.get('/weather', (request, response) => {
   superagent.get('https://api.weatherbit.io/v2.0/forecast/daily')
     .query({
@@ -42,18 +49,10 @@ app.get('/weather', (request, response) => {
     });
 });
 
-function Movie(selection) {
-  this.title = selection.title;
-  this.overview = selection.overview;
-}
+
 
 app.get('/movies', (request, response) => {
-  superagent.get('https://api.themoviedb.org/3/search/movie')
-    .query({
-      api_key: process.env.MOVIE_API_KEY,
-      // query: request.query.city,
-      query: 'Portland',
-    })
+  superagent.get(`https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${request.query.city}`)
     .then(movieInfo => {
       console.log(movieInfo.body.results.map(selection => (new Movie(selection))));
       response.json(movieInfo.body.results.map(selection => (new Movie(selection))));
