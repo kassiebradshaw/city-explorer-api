@@ -8,13 +8,7 @@ const superagent = require('superagent');
 
 const app = express();
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    callback(null, true);
-  }
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 const PORT = process.env.PORT || 3001;
 
@@ -41,13 +35,16 @@ app.get('/weather', (request, response) => {
     .query({
       key: process.env.WEATHER_API_KEY,
       lat: request.query.lat,
-      lon: request.query.lon,
+      lon: request.query.lon
     })
-    .set({ 'Access-Control-Allow-Origin': '*' })
     .then(weatherData => {
       response.json(weatherData.body.data.map(day => (new Forecast(day))));
+    })
+    .catch(err => {
+      console.error(err);
     });
-});
+}
+);
 
 
 
@@ -55,14 +52,16 @@ app.get('/movies', (request, response) => {
   superagent.get('https://api.themoviedb.org/3/search/movie')
     .query({
       api_key: process.env.MOVIE_API_KEY,
-      query: request.query.query
+      query: request.query.city
     })
-    .set({ 'Access-Control-Allow-Origin': '*' })
     .then(movieInfo => {
       console.log(movieInfo.body.results.map(selection => (new Movie(selection))));
       response.json(movieInfo.body.results.map(selection => (new Movie(selection))));
     }
-    );
+    )
+    .catch(err => {
+      console.error(err);
+    });
 });
 
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`));
