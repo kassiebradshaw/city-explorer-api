@@ -42,6 +42,7 @@ app.get('/weather', (request, response) => {
     })
     .catch(err => {
       console.error(err);
+      response.status(500).send('Server error');
     });
 }
 );
